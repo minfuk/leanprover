@@ -50,6 +50,10 @@ begin
   apply H11 ▸ H14
 end
 
+corollary closed_continuous_preimage_closed {f : M → N} (C : continuous f) {V : set N} (H : closed V)
+  : closed (f '- V) :=
+  (preimage_compl f V) ▸ (open_continuous_preimage_open C H)
+
 lemma not_empty_image_not_empty_preimage {f : M → N} {U : set M} (H : f ' U ≠ ∅)
   : U ≠ ∅ :=
 begin

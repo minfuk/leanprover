@@ -23,6 +23,121 @@ definition compact (U : set M) :=
   ∀S : set (set M), S ⊆ opens M → U ⊆ ⋃₀ S
     → ∃S' : set (set M), S' ⊆ S ∧ finite S' ∧ U ⊆ ⋃₀ S'
 
+definition subset_family (A : set (set M)) (U : set M) :=
+  ∀(a : set M), a ∈ A → a ⊆ U
+
+definition finite_intersection_property (A : set (set M)) (U : set M) :=
+  subset_family A U ∧ ∀(A' : set (set M)), A' ⊆ A ∧ finite A' → ⋂₀ A' ≠ ∅
+
+lemma compact_contraposition (U : set M) [Hc : compact U]
+  {A : set (set M)} (H0 : A ⊆ opens M)
+  (H : ∀(A' : set (set M)), A' ⊆ A ∧ finite A' → ¬(U ⊆ ⋃₀ A')) :
+  ¬(U ⊆ ⋃₀ A) :=
+  assume H1 : U ⊆ ⋃₀ A,
+  obtain (A' : set (set M)) (H2 : A' ⊆ A ∧ finite A' ∧ U ⊆ ⋃₀ A'),
+    from Hc A H0 H1,
+  have H3 : U ⊆ ⋃₀ A', from (and.right (and.right H2)),
+  have H4 : ¬(U ⊆ ⋃₀ A'), from (H A' (and.intro (and.left H2) (and.left (and.right H2)))),
+  show false, from not.elim H4 H3
+  
+lemma not_subset_mem_compl {U V : set M} (H : ¬(U ⊆ V)) : ∃(a : M), a ∈ -V :=
+  have H1 : U ∩ (-V) ≠ ∅, from
+    assume H2 : U ∩ (-V) = ∅,
+    have H9 : U ⊆ V, from
+      take x,
+      assume H3 : x ∈ U,
+      have H4 : x ∉ (-V), from
+        assume H5 : x ∈ (-V),
+        have H6 : x ∈ U ∧ x ∈ (-V), from and.intro H3 H5,
+        have H7 : U ∩ (-V) ≠ ∅, from ne_empty_of_mem H6,
+        not.elim H7 H2,
+      show x ∈ V, from (compl_compl V) ▸ (mem_compl H4),
+    not.elim H H9,
+  have H8 : ∃(a : M), a ∈ U ∩ (-V), from exists_mem_of_ne_empty H1,
+  obtain (a : M) (H2 : a ∈ U ∧ a ∈ (-V)), from H8,
+  exists.intro a (and.right H2)
+
+theorem compact_closed_subsets_inter_not_empty
+  (U : set M) [Uc : compact U] [Im : inhabited M]:
+  ∀(A : set (set M)), subset_family A U ∧ (∀(a : set M), a ∈ A → closed a)
+    → finite_intersection_property A U
+    → ⋂₀ A ≠ ∅ :=
+  take A : set (set M),
+  assume H1 : subset_family A U ∧ (∀(a : set M), a ∈ A → closed a),
+  assume H2 : finite_intersection_property A U,
+  have H001 : (compl ' A) ⊆ opens M, from
+    take a : set M,
+    assume H002 : a ∈ (compl ' A),
+    have H003 : -a ∈ A, from (iff.elim_left (mem_image_compl a A)) H002,
+    have H004 : closed (-a), from (and.right H1) (-a) H003,
+    (iff.elim_right (Open_iff_closed_compl a)) H004,
+  by_cases
+    (assume H048 : U = ∅,
+    have H047 : A = ∅, from
+      by_contradiction (
+        assume H043 : A ≠ ∅,
+        obtain (a : set M) (H042 : a ∈ A), from exists_mem_of_ne_empty H043,
+        have H041 : a ⊆ U, from (and.left H1) a H042,
+        have H040 : a = ∅, from eq_empty_of_subset_empty (H048 ▸ H041),
+        have H039 : ⋂₀ A = ∅,
+          from eq_empty_of_subset_empty (H040 ▸ (sInter_subset_of_mem H042)),
+        have H038 : ⋂₀ A ≠ ∅, from sorry,
+        not.elim H038 H039),
+    have H046 : ⋂₀ A = univ, from H047⁻¹ ▸ sInter_empty,
+    show ⋂₀ A ≠ ∅, from
+      assume H045 : ⋂₀ A = ∅,
+      have H044 : ∅ = univ, from H046 ▸ H045⁻¹,
+      not.elim empty_ne_univ H044)
+    (assume H049 : U ≠ ∅,
+    have H097 : ∀(A' : set (set M)), A' ⊆ (compl ' A) ∧ finite A' → ¬(U ⊆ ⋃₀ A'), from
+      take A' : set(set M),
+      assume H092 : A' ⊆ (compl ' A) ∧ finite A',
+      have H095 : (compl ' A') ⊆ A, from
+        take x : set M,
+        assume H094 : x ∈ (compl ' A'),
+        have H093 : -x ∈ A', from (iff.elim_left (mem_image_compl x A')) H094,
+        have H091 : -x ∈ (compl ' A), from mem_of_subset_of_mem (and.left H092) H093,
+        have H090 : -(-x) ∈ A, from (iff.elim_left (mem_image_compl (-x) A)) H091,
+        (compl_compl x) ▸ H090, -- by classical
+      have H088 : finite (compl ' A'), from @finite_image _ _ compl A' (and.right H092),
+      have H096 : ⋂₀ (compl ' A') ≠ ∅,
+        from (and.right H2) (compl ' A') (and.intro H095 H088),
+      obtain (x : M) (H085 : x ∈ ⋂₀ (compl ' A')), from exists_mem_of_ne_empty H096,
+      have H086 : x ∈ - ⋃₀ A', from ((compl_sUnion A')⁻¹) ▸ H085,
+      have H059 : x ∉ ⋃₀ A', from not_mem_of_mem_compl H086,
+      show ¬(U ⊆ ⋃₀ A'), from
+        by_cases
+          (assume H0x1 : compl ' A' = ∅,
+          show ¬(U ⊆ ⋃₀ A'), from
+            assume H0x2 : U ⊆ ⋃₀ A',
+            have H0y3 : A' = ∅, from
+              by_contradiction (
+                assume H0x3 : A' ≠ ∅,
+                obtain (a : set M) (H0x4 : a ∈ A'), from exists_mem_of_ne_empty H0x3,
+                have H0x5 : (-a) ∈ compl ' A', from
+                  (iff.elim_right (mem_image_compl (-a) A')) ((compl_compl a)⁻¹ ▸ H0x4),
+                have H0x6 : compl ' A' ≠ ∅, from ne_empty_of_mem H0x5,
+                not.elim H0x6 H0x1),
+            have H0x7 : ⋃₀ A' = ∅, from H0y3⁻¹ ▸ sUnion_empty,
+            have H0x8 : U = ∅, from eq_empty_of_subset_empty (H0x7 ▸ H0x2),
+            not.elim H049 H0x8)
+        (assume H058 : compl ' A' ≠ ∅,
+        have H084 : x ∈ U, from
+          obtain (a : set M) (H081 : a ∈ compl ' A'), from exists_mem_of_ne_empty H058,
+          have H069 : x ∈ a, from H085 H081,
+          have H080 : a ∈ A, from mem_of_subset_of_mem H095 H081,
+          show x ∈ U, from mem_of_subset_of_mem ((and.left H1) a H080) H069,
+        show ¬(U ⊆ ⋃₀ A'), from
+          assume H077 : U ⊆ ⋃₀ A',
+          have H075 : x ∈ ⋃₀ A', from H077 H084,
+          not.elim H059 H075),
+    have H099 : ¬(U ⊆ ⋃₀ (compl ' A)),
+      from @compact_contraposition _ _ U Uc _ H001 H097,
+    have H098 : ∃(a : M), a ∈ -(⋃₀ (compl ' A)), from not_subset_mem_compl H099,
+    have H100 : ∃(a : M), a ∈ ⋂₀ A, from ((sInter_eq_comp_sUnion_compl A)⁻¹) ▸ H098,
+    obtain (a : M) (H101 : a ∈ ⋂₀ A), from H100,
+    show ⋂₀ A ≠ ∅, from ne_empty_of_mem H101)
+
 variables {N : Type} [Tn : topology N]
 include Tn
 
@@ -318,3 +433,4 @@ theorem compact_continuous_image_compact
   have H14 : (f ' U) ⊆ ⋃₀ t, from
     (and.left (and.right (and.right H21))) U (and.right (and.right H9)),
   exists.intro t (and.intro H10 (and.intro H13 H14))
+

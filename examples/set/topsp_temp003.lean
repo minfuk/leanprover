@@ -68,12 +68,12 @@ lemma iff_mem_image_preimage (f : M → N) (S : I → set N) (a : set I) (i : I)
         have Ha4 : (restrict S a) i = ∅, from restrict_not_mem S Ha3,
         have Ha5 : (restrict S a) i ≠ ∅, from ne_empty_of_mem Ha1,
         not.elim Ha5 Ha4),
-     have Ha6 : (restrict S a) i = S i, from restrict_mem S Ha2,
-     have Ha7 : f x ∈ S i, from Ha6 ▸ Ha1,
-     have Ha8 : x ∈ f '- (S i), from
-       iff.elim_left (mem_preimage_iff f (S i) x) Ha7,
-     have Ha9 : (restrict T a) i = f '- (S i), from restrict_mem T Ha2,
-     Ha9⁻¹ ▸ Ha8)
+      have Ha6 : (restrict S a) i = S i, from restrict_mem S Ha2,
+      have Ha7 : f x ∈ S i, from Ha6 ▸ Ha1,
+      have Ha8 : x ∈ f '- (S i), from
+        iff.elim_left (mem_preimage_iff f (S i) x) Ha7,
+      have Ha9 : (restrict T a) i = f '- (S i), from restrict_mem T Ha2,
+      Ha9⁻¹ ▸ Ha8)
     (assume Hb1 : x ∈ (restrict T a) i,
     have Hb2 : i ∈ a, from
       by_contradiction
@@ -81,12 +81,12 @@ lemma iff_mem_image_preimage (f : M → N) (S : I → set N) (a : set I) (i : I)
         have Hb4 : (restrict T a) i = ∅, from restrict_not_mem T Hb3,
         have Hb5 : (restrict T a) i ≠ ∅, from ne_empty_of_mem Hb1,
         not.elim Hb5 Hb4),
-     have Hb6 : (restrict T a) i = f '- (S i), from restrict_mem T Hb2,
-     have Hb7 : x ∈ f '- (S i), from Hb6 ▸ Hb1,
-     have Hb8 : f x ∈ S i, from
-       iff.elim_right (mem_preimage_iff f (S i) x) Hb7,
-     have Hb9 : (restrict S a) i = S i, from restrict_mem S Hb2,
-     Hb9⁻¹ ▸ Hb8)
+      have Hb6 : (restrict T a) i = f '- (S i), from restrict_mem T Hb2,
+      have Hb7 : x ∈ f '- (S i), from Hb6 ▸ Hb1,
+      have Hb8 : f x ∈ S i, from
+        iff.elim_right (mem_preimage_iff f (S i) x) Hb7,
+      have Hb9 : (restrict S a) i = S i, from restrict_mem S Hb2,
+      Hb9⁻¹ ▸ Hb8)
 
 theorem compact_continuous_image_compact
   (f : M → N) [fc : continuous f] (U : set M) [Uc : @compact I _ _ U]

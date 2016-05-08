@@ -164,7 +164,7 @@ section entry20070821
       (@respect_comp'' D a)
 
   -- 反変Hom関手
-  definition contravariant_hom_functor : Dᵒᵖ ⇒ set.{v} :=
+  definition contravariant_hom_functor (a : carrier D) : Dᵒᵖ ⇒ set.{v} :=
     functor.mk
       (@to_fun_ob' D a)
       (@to_fun_hom' D a)
@@ -172,12 +172,14 @@ section entry20070821
       (@respect_comp' D a)
 
   -- 共変Hom関手
-  definition covariant_hom_functor : D ⇒ set.{v} :=
+  definition covariant_hom_functor (a : carrier D)  : D ⇒ set.{v} :=
     functor.mk
       (@to_fun_ob'' D a)
       (@to_fun_hom'' D a)
       (@respect_id'' D a)
       (@respect_comp'' D a)
+
+
 
 end entry20070821
 

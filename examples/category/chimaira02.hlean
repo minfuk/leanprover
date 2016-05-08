@@ -45,7 +45,7 @@ section entry20070524
 end entry20070524
 
 section entry20070821
-  open category
+  open category functor
 
 /-
   variables {ob : Type} [C : precategory ob]
@@ -157,6 +157,22 @@ section entry20070821
     eq_of_homotopy H
 
   example : functor D set.{v} :=
+    functor.mk
+      (@to_fun_ob'' D a)
+      (@to_fun_hom'' D a)
+      (@respect_id'' D a)
+      (@respect_comp'' D a)
+
+  -- 反変Hom関手
+  definition contravariant_hom_functor : Dᵒᵖ ⇒ set.{v} :=
+    functor.mk
+      (@to_fun_ob' D a)
+      (@to_fun_hom' D a)
+      (@respect_id' D a)
+      (@respect_comp' D a)
+
+  -- 共変Hom関手
+  definition covariant_hom_functor : D ⇒ set.{v} :=
     functor.mk
       (@to_fun_ob'' D a)
       (@to_fun_hom'' D a)

@@ -113,6 +113,7 @@ section entry20070821
                   (to_fun_hom' g) (to_fun_hom' f)) i : rfl,
     eq_of_homotopy H
 
+  -- universe変数をつけないとうまくいかない
   example : functor Dᵒᵖ set.{v} :=
     functor.mk
       (@to_fun_ob' D a)

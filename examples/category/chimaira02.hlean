@@ -204,6 +204,7 @@ section entry20070821
   theorem Ha0 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
     (i : a ⟶ b) (j : b ⟶ a) :
     hom.a τ (j ∘ i) = (hom.b τ j) ∘ i :=
+/-
     calc hom.a τ (j ∘ i)
           = hom.a τ ((λx, x ∘ i) j) : rfl
       ... = ((natural_map (to_hom τ) a) ∘ (to_fun_hom (contravariant_hom_functor a) i)) j : rfl
@@ -211,10 +212,13 @@ section entry20070821
         : apd10' j ((@naturality _ _ _ _ (to_hom τ) b a i)⁻¹)
       ... = (λx, x ∘ i) (hom.b τ j) : rfl
       ... = (hom.b τ j) ∘ i : rfl
+-/
+    apd10' j ((@naturality _ _ _ _ (to_hom τ) b a i)⁻¹)
 
   theorem Hb0 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
     (i : a ⟶ b) (j : b ⟶ a) :
     inv.b τ (i ∘ j) = (inv.a τ i) ∘ j :=
+/-
     calc inv.b τ (i ∘ j)
           = inv.b τ ((λx, x ∘ j) i) : rfl
       ... = ((natural_map (to_inv τ) b) ∘ (to_fun_hom (contravariant_hom_functor b) j)) i : rfl
@@ -222,18 +226,26 @@ section entry20070821
         : apd10' i ((@naturality _ _ _ _ (to_inv τ) a b j)⁻¹)
       ... = (λx, x ∘ j) (inv.a τ i) : rfl
       ... = (inv.a τ i) ∘ j : rfl
+-/
+    apd10' i ((@naturality _ _ _ _ (to_inv τ) a b j)⁻¹)
 
   theorem Ha1 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
     : (to_inv τ) ∘n (to_hom τ) = 1 :=
+/-
     calc (to_inv τ) ∘n (to_hom τ)
           = (@inverse (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _) ∘n (to_hom τ) : rfl
       ... = 1 : @left_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
+-/
+    @left_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
 
   theorem Hb1 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
     : (to_hom τ) ∘n (to_inv τ) = 1 :=
+/-
     calc (to_hom τ) ∘n (to_inv τ)
           = (to_hom τ) ∘n (@inverse (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _) : rfl
       ... = 1 : @right_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
+-/
+      @right_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
 
 /-
 theorem Ha3 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
@@ -306,117 +318,4 @@ set_option unifier.max_steps 50000
 
 end entry20070821
 
-section entry20070827
 
-
-
-end entry20070827
-
-section entry20080121
-
-
-
-end entry20080121
-
-section entry20080123
-
-
-
-end entry20080123
-
-section entry20090430
-
-
-
-end entry20090430
-
-section entry20090525
-
-
-
-end entry20090525
-
-section entry20090817
-
-
-
-end entry20090817
-
-section entry20091030
-
-
-
-end entry20091030
-
-section entry20091111
-
-
-
-end entry20091111
-
-section entry20091112
-
-
-
-end entry20091112
-
-section entry20091127
-
-
-
-end entry20091127
-
-section entry20091201
-
-
-
-end entry20091201
-
-section entry20100210
-
-
-
-end entry20100210
-
-section entry20100305
-
-
-
-end entry20100305
-
-
-section entry20100821
-
-
-
-end entry20100821
-
-section entry20101102
-
-
-
-end entry20101102
-
-section entry20110520
-
-
-
-end entry20110520
-
-section entry20110603
-
-
-
-end entry20110603
-
-section entry20110628
-
-
-
-end entry20110628
-
-section entry20110721
-
-
-
-end entry20110721

@@ -5,26 +5,13 @@ open eq is_trunc trunc equiv is_equiv iso funext category functor nat_trans bool
 section entry20070827
   open algebra
 
-  variables {A : Type}
-  variables [HA : is_set A] [OA : weak_order A]
-    [Hle : Π a b : A, is_prop (a ≤ b)]
+  definition cat_a {A : Type} [HA : is_set A]
+    [OA : weak_order A] [Hle : Π a b : A, is_prop (a ≤ b)]
+    : Precategory :=
+    Precategory.mk A (precategory_order A)
 
-  section
-    include A HA OA Hle
-
-    definition cat_a : Precategory :=
-      Precategory.mk A (precategory_order A)
-
-    example {a b c : A} (H1 : a ≤ b) (H2 : b ≤ c) (H3 : a = c)
-      : (a = b) × (b = c) :=
-      pair
-        (eq_of_le_of_ge H1 (H3⁻¹ ▸ H2))
-        (eq_of_le_of_ge H2 (H3 ▸ H1))
-
-  end
-  
-  definition cat_b1 : precategory unit :=
-    precategory.mk'
+  definition cat_b : Precategory :=
+    Precategory.mk unit (precategory.mk'
       (λ a b, bool)
       (λ a b c f g, f && g)
       (λ a, tt)
@@ -33,13 +20,13 @@ section entry20070827
       (λ a b f, tt_band f)
       (λ a b f, band_tt f)
       (λ a, tt_band tt)
-      (λ a b, is_set_bool)
-
-  definition cat_b : Precategory :=
-    Precategory.mk unit cat_b1
+      (λ a b, is_set_bool))
 
   open decidable
-  
+
+  variables {A : Type} [HA : is_set A]
+    [OA : weak_order A] [Hle : Π a b : A, is_prop (a ≤ b)]
+
   variables [Hde : decidable_eq (@cat_a A HA OA Hle)]
   include Hde
 
@@ -48,25 +35,6 @@ section entry20070827
   | inl H₁ := tt
   | inr H₁ := ff
   end
-
-/-
-  theorem cat_a_weak_order : weak_order (@cat_a A HA OA Hle) :=
-    weak_order.mk (@has_le.le A _)
-      (@weak_order.le_refl A _)
-      (@weak_order.le_trans A _)
-      (@weak_order.le_antisymm A _)
-
-  theorem hom_le' {a b : (Precategory.mk A (precategory_order A))} (f : hom a b) :  a ≤ b :=
-  begin
-    exact f,
-  end
-
-  theorem hom_le_eq [OA' : weak_order (@cat_a A HA OA Hle)] :
-    (@weak_order.le A _) = (@weak_order.le (@cat_a A HA OA Hle) _) := sorry
--/
-
-  theorem hom_le {a b : (@cat_a A HA OA Hle)} (f : hom a b)
-    : (@weak_order.le A _) a b := by exact f
 
   theorem maphom_tt {a b : (@cat_a A HA OA Hle)} (f : hom a b) (H : a = b)
     : maphom f = tt :=
@@ -87,12 +55,10 @@ section entry20070827
     end
   
   definition maphom_prop {a b c : (@cat_a A HA OA Hle)}
---    [OA' : weak_order (@cat_a A HA OA Hle)]
-    (f : hom a b) (g : hom b c) : maphom (g ∘ f) = (maphom g) && (maphom f) :=
---    have Hf : a ≤ b, from hom_le f,
---    have Hg : b ≤ c, from hom_le g,
-    have Hf : (@weak_order.le A _) a b, from hom_le f,
-    have Hg : (@weak_order.le A _) b c, from hom_le g,
+    (f : hom a b) (g : hom b c)
+    : maphom (g ∘ f) = (maphom g) && (maphom f) :=
+    have Hf : (@weak_order.le A _) a b, from f,
+    have Hg : (@weak_order.le A _) b c, from g,
     decidable.by_cases
       (assume H1 : a = c,
         have H2 : a = b, from @eq_of_le_of_ge A OA a b Hf (H1⁻¹ ▸ Hg),
@@ -122,18 +88,12 @@ section entry20070827
                   ... = ff : ff_band (maphom f),
               H4b⁻¹ ▸ H1a))
 
-  theorem maphom_a (a : (@cat_a A HA OA Hle)) : maphom (ID a) = tt :=
-    maphom_tt (ID a) (rfl)
-
   definition functor_example : functor (@cat_a A HA OA Hle) cat_b :=
     functor.mk
       (λ x, unit.star)
       (λ a b f, maphom f)
-      (λ a, maphom_a a)
---      (λ a b c g f,
---        @maphom_prop A HA OA Hle Hde a b c cat_a_weak_order f g)
-      (λ a b c g f,
-        @maphom_prop A HA OA Hle Hde a b c f g)
+      (λ a, maphom_tt (ID a) (rfl))
+      (λ a b c g f, maphom_prop f g)
 
 end entry20070827
 

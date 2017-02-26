@@ -25,7 +25,10 @@ namespace Functor
   attribute [irreducible] respect_id
   attribute [irreducible] respect_comp
 
-  variables {A B C D : Category}
+  variables {A : Category}
+  variables {B : Category}
+  variables {C : Category}
+  variables {D : Category}
 
   instance functor_object_to_fun : has_coe_to_fun (Functor A B) :=
   { F := λ _, A^.carrier → B^.carrier,
@@ -77,6 +80,49 @@ namespace Functor
   begin
     cases F,
     apply rfl
+  end
+
+end Functor
+
+namespace category
+  open Functor
+  attribute [reducible]
+  definition category_of_categories : category Category :=
+  mk (λ a b, Functor a b)
+     (λ a b c g f, Functor.compose g f)
+     (λ a, Functor.id)
+     (λ a b c d h g f, Functor.assoc h g f)
+     (λ a b f, Functor.id_left f)
+     (λ a b f, Functor.id_right f)
+
+  def Category_of_categories := Mk category_of_categories
+
+  namespace ops
+    notation `Cat`:max := Category_of_categories
+  end ops
+end category
+
+namespace Functor
+
+  variables {C : Category}
+  variables {D : Category}
+
+  protected theorem hequal {F G : C ⇒ D} : Π (Hob : ∀x, F x = G x)
+      (Hmor : ∀a b (f : @category.hom _ C^.struct a b),
+        F^.morphism f == G^.morphism f), F = G :=
+  begin
+    intro Hob,
+    intro Hmor,
+    have Hob' : F^.object = G^.object, from funext Hob,
+    have Hmor' : F^.morphism == G^.morphism, from
+      sorry, -- hfunext (λ a, hfunext (λ b, hfunext (λ (f : @category.hom _ C^.struct a b), Hmor a b f))),
+    begin
+      cases F,
+      cases G,
+      cases Hob',
+      cases Hmor',
+      apply rfl
+    end
   end
 
 end Functor

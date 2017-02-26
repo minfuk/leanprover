@@ -1,5 +1,6 @@
+universe variable u
 
-class category (ob : Type) :=
+class category (ob : Type u) :=
   (hom : ob → ob → Type)
   (comp : Π ⦃a b c : ob⦄, hom b c → hom a b → hom a c)
   (ID : Π (a : ob), hom a a)
@@ -36,7 +37,7 @@ namespace category
 end category
 
 structure Category :=
-(carrier : Type)
+(carrier : Type u)
 (struct : category carrier)
 
 instance Category_to_sort : has_coe_to_sort Category :=

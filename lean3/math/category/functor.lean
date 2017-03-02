@@ -1,4 +1,5 @@
 import .category
+import ...logic.cast
 open category
 
 section abbr
@@ -102,6 +103,10 @@ namespace category
   end ops
 end category
 
+/-
+funext : ∀ {α : Type u} {β : α → Type v} {f₁ f₂ : Π (x : α), β x}, (∀ (x : α), f₁ x = f₂ x) → f₁ = f₂
+-/
+
 namespace Functor
 
   variables {C : Category}
@@ -115,7 +120,7 @@ namespace Functor
     intro Hmor,
     have Hob' : F^.object = G^.object, from funext Hob,
     have Hmor' : F^.morphism == G^.morphism, from
-      sorry, -- hfunext (λ a, hfunext (λ b, hfunext (λ (f : @category.hom _ C^.struct a b), Hmor a b f))),
+      hfunext (λ a, hfunext (λ b, hfunext (λ (f : @category.hom _ C^.struct a b), Hmor a b f))),
     begin
       cases F,
       cases G,

@@ -48,3 +48,6 @@ namespace category
   definition MK (a b c d e f g) : Category := Category.mk a (category.mk b c d e f g)
 
 end category
+
+theorem Category.equal (C : Category) : Category.mk C^.carrier C^.struct = C :=
+Category.rec (λ ob c, rfl) C

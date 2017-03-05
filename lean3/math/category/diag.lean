@@ -6,6 +6,7 @@ namespace category.diag
 
   open category.ops
 
+  attribute [reducible]
   definition diag_functor {C : Category} : C ⇒ (C ×c C) :=
   Functor.mk
     (λa, (a, a) )

@@ -8,7 +8,7 @@ section
     by subst H₁; subst H₂
 
   theorem cast_to_heq {a : α} {a' : α'} {H₁ : α = α'} (H₂ : cast H₁ a = a') : a == a' :=
-    sorry -- eq_rec_to_heq _ H₂
+    eq_rec_to_heq H₁ H₂
 
   theorem pi_eq (H : β = β') : (Π x, β x) = (Π x, β' x) :=
     by subst H

@@ -153,8 +153,7 @@ namespace morphism
 
     attribute [instance]
     theorem is_equivalence_eq (T : Type) : is_equivalence (isomorphic : ob → ob → Type) :=
-    -- refl symm trans
-    sorry
+      is_equivalence.mk refl symm trans
   end isomorphic
 
   attribute [class]

@@ -57,8 +57,13 @@ namespace Functor
 
   definition contra_hom_functor_hom {x y : Dᵒᵖ^.carrier}
     (f : @hom _ (Dᵒᵖ^.struct) x y)
-    : (@homset _ (Dᵒᵖ^.struct) a x) → (@homset _ (Dᵒᵖ^.struct) a y)
-    := λ u, @category.comp _ (Dᵒᵖ^.struct) _ _ _ f u
+    : (contra_hom_functor_ob x) → (contra_hom_functor_ob y)
+    := λ u, @category.comp _ (Dᵒᵖ^.struct) a _ _ f u
+
+  attribute [reducible]
+  private def comp_op_cat {x y z : Dᵒᵖ^.carrier}
+    (f : @hom _ (Dᵒᵖ^.struct) y z) (g : @hom _ (Dᵒᵖ^.struct) x y)
+    := @category.comp _ (Dᵒᵖ^.struct) x y z f g
 
   theorem contra_hom_functor_resp_id (x : Dᵒᵖ^.carrier) :
     contra_hom_functor_hom (@ID _ (Dᵒᵖ^.struct) x)
@@ -66,23 +71,21 @@ namespace Functor
     let id' := (@ID _ (Dᵒᵖ^.struct) x) in
     funext (take x' : @contra_hom_functor_ob _ _ x,
       calc contra_hom_functor_hom id' x'
-            = @category.comp _ (Dᵒᵖ^.struct) _ _ _ 
-              id' (x' : @hom _ (Dᵒᵖ^.struct) _ x) : rfl
+            = comp_op_cat id' x' : rfl
         ... = x' : @id_left _ (Dᵒᵖ^.struct) _ _ x')
 
   theorem contra_hom_functor_resp_comp {x y z : Dᵒᵖ^.carrier}
     (g : @hom _ (Dᵒᵖ^.struct) y z) (f : @hom _ (Dᵒᵖ^.struct) x y) :
-    contra_hom_functor_hom (@category.comp _ (Dᵒᵖ^.struct) _ _ _ g f)
+    contra_hom_functor_hom (comp_op_cat g f)
       = @category.comp _ Set_category^.struct (@contra_hom_functor_ob D a x)
         (@contra_hom_functor_ob D a y) (@contra_hom_functor_ob D a z)
         (contra_hom_functor_hom g) (contra_hom_functor_hom f) :=
     funext (take i : contra_hom_functor_ob x,
-        calc (contra_hom_functor_hom (@category.comp _ (Dᵒᵖ^.struct) _ _ _ g f)) i
-              = @category.comp _ (Dᵒᵖ^.struct) _ _ _ 
-                  (@category.comp _ (Dᵒᵖ^.struct) _ _ _ g f) i : rfl
-          ... = @category.comp _ (Dᵒᵖ^.struct) _ _ _ g
-                  (@category.comp _ (Dᵒᵖ^.struct) _ _ _ f i) : by rw assoc
-          ... = (contra_hom_functor_hom g) (@category.comp _ (Dᵒᵖ^.struct) _ _ _ f i) : rfl
+        calc (contra_hom_functor_hom (comp_op_cat g f)) i
+              = comp_op_cat (comp_op_cat g f) i : rfl
+          ... = comp_op_cat g (comp_op_cat f i)
+                : eq.symm (@assoc _ (Dᵒᵖ^.struct) _ _ _ _ g f i)
+          ... = (contra_hom_functor_hom g) (comp_op_cat f i) : rfl
           ... = (@category.comp _ Set_category^.struct _ _ _
                   (contra_hom_functor_hom g) (contra_hom_functor_hom f)) i : rfl)
 
@@ -99,31 +102,35 @@ namespace Functor
 
   definition co_hom_functor_hom {x y : D^.carrier}
     (f : @hom _ D^.struct x y)
-    : (@homset _ D^.struct a x) → (@homset _ D^.struct a y)
-    := λ u, @category.comp _ D^.struct _ _ _ f u
+    : (co_hom_functor_ob x) → (co_hom_functor_ob y)
+    := λ u, @category.comp _ D^.struct a _ _ f u
+
+  attribute [reducible]
+  private def comp_cat {x y z : D^.carrier}
+    (f : @hom _ D^.struct y z) (g : @hom _ D^.struct x y)
+    := @category.comp _ D^.struct x y z f g
 
   theorem co_hom_functor_resp_id (x : D^.carrier) :
     co_hom_functor_hom (@category.ID _ D^.struct x)
       = @category.ID _ Set_category^.struct (@co_hom_functor_ob D a x) :=
     let id' := (@category.ID _ D^.struct x) in
     funext (take x' : co_hom_functor_ob x,
-      calc co_hom_functor_hom (@category.ID _ D^.struct x) x'
-            = @category.comp _ D^.struct _ _ _ id' x' : rfl
+      calc co_hom_functor_hom id' x'
+            = comp_cat id' x' : rfl
         ... = x' : @id_left _ (D^.struct) _ _ x')
 
   theorem co_hom_functor_resp_comp {x y z : D^.carrier}
     (g : @hom _ D^.struct y z) (f : @hom _ D^.struct x y) :
-    co_hom_functor_hom (@category.comp _ D^.struct _ _ _ g f)
+    co_hom_functor_hom (comp_cat g f)
       = @category.comp _ Set_category^.struct (@co_hom_functor_ob D a x)
         (@co_hom_functor_ob D a y) (@co_hom_functor_ob D a z)
         (co_hom_functor_hom g) (co_hom_functor_hom f) :=
     funext (take i : co_hom_functor_ob x,
-        calc (co_hom_functor_hom (@category.comp _ D^.struct _ _ _ g f)) i
-              = @category.comp _ D^.struct _ _ _ 
-                  (@category.comp _ D^.struct _ _ _ g f) i : rfl
-          ... = @category.comp _ D^.struct _ _ _ g
-                  (@category.comp _ D^.struct _ _ _ f i) : by rw assoc
-          ... = (co_hom_functor_hom g) (@category.comp _ D^.struct _ _ _ f i) : rfl
+        calc (co_hom_functor_hom (comp_cat g f)) i
+              = comp_cat (comp_cat g f) i : rfl
+          ... = comp_cat g (comp_cat f i)
+                : eq.symm (@assoc _ D^.struct _ _ _ _ g f i)
+          ... = (co_hom_functor_hom g) (comp_cat f i) : rfl
           ... = (@category.comp _ Set_category^.struct _ _ _
                   (co_hom_functor_hom g) (co_hom_functor_hom f)) i : rfl)
 

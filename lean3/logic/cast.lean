@@ -3,6 +3,20 @@ section
   universe variables u v
   variables {α α' : Type u} {β β' : α → Type v}
 
+  theorem hcongr_fun {f : Π x, β x} {f' : Π x, β' x} (a : α) (H₁ : f == f') (H₂ : β = β') :
+    f a == f' a :=
+  begin
+    cases H₂, cases H₁, reflexivity
+  end
+
+  theorem hcongr_arg (f : Π x, β x) {a b : α} (H : a = b) : f a == f b :=
+  H ▸ (heq.refl (f a))
+end
+
+section
+  universe variables u v
+  variables {α α' : Type u} {β β' : α → Type v}
+
   theorem eq_rec_to_heq {a a' : α} {b : β a} {b' : β a'}
     (H₁ : a = a') (H₂ : @eq.rec_on α a β a' H₁ b = b') : b == b' :=
     by subst H₁; subst H₂
@@ -15,7 +29,7 @@ section
 
   theorem cast_app (H : β = β') (f : Π x, β x) (a : α) :
     cast (pi_eq H) f a == f a :=
-    sorry -- by subst H
+    hcongr_fun a (cast_heq (pi_eq H) f) (eq.symm H)
 
   theorem hfunext {f : Π (x : α), β x} {g : Π (x : α), β' x}
     (H : ∀ a, f a == g a) : f == g :=

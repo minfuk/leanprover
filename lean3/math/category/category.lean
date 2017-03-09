@@ -10,7 +10,7 @@ class category (ob : Type u) :=
   (id_right : Π ⦃a b : ob⦄ (f : hom a b), comp f (ID _) = f)
 
 namespace category
-  variables {ob : Type} [C : category ob]
+  variables {ob : Type u} [C : category ob]
   variables {a b c d : ob}
   include C
 

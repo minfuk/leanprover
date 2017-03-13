@@ -8,7 +8,9 @@ import .category
 import .functor
 open category functor
 
-structure natural_transformation {C D : Category} (F G : C ⇒ D) :=
+universe variables u v
+
+structure natural_transformation {C : Category} {D : Category} (F G : C ⇒ D) :=
 (eta : Π(a : C), @hom _ D^.struct (F a) (G a))
 (commute : Π {a b : C} (f : @hom _ C^.struct a b),
   @comp _ D^.struct _ _ _ (G^.morphism f) (eta a) = @comp _ D^.struct _ _ _ (eta b) (F^.morphism f))
@@ -28,7 +30,7 @@ namespace natural_transformation
       @comp _ D^.struct _ _ _ (η b) (F^.morphism f) :=
     take a, take b, η^.commute
   
-  protected definition compose (η : G ⟹ H) (θ : F ⟹ G) : F ⟹ H :=
+  definition compose (η : G ⟹ H) (θ : F ⟹ G) : F ⟹ H :=
   let infixr `⟶` := λ(a b : D), @hom _ D^.struct a b in
   let infixr `∘` := λ{a b c : D} (f : b ⟶ c) (g : a ⟶ b), @comp _ D^.struct _ _ _ f g in
   let assoc := λ{a b c d : D} h g f, @assoc _ D^.struct a b c d h g f in
@@ -62,14 +64,14 @@ namespace natural_transformation
     apply rfl
   end
 
-  protected definition id {C D : Category} {F : Functor C D} : natural_transformation F F :=
+  protected definition id {F : Functor C D} : natural_transformation F F :=
   mk (λa, @ID _ D^.struct (F a))
     (λa b f,
       calc @comp _ D^.struct _ _ _ (F^.morphism f) (@ID _ D^.struct (F a))
             = (F^.morphism f) : @id_right _ D^.struct _ _ (F^.morphism f)
         ... = @comp _ D^.struct _ _ _ (@ID _ D^.struct (F b)) (F^.morphism f)
           : eq.symm (@id_left _ D^.struct _ _ (F^.morphism f)))
-  protected definition ID {C D : Category} (F : Functor C D) : natural_transformation F F := natural_transformation.id
+  protected definition ID (F : Functor C D) : natural_transformation F F := natural_transformation.id
 
   protected theorem id_left (η : F ⟹ G) : natural_transformation.compose natural_transformation.id η = η :=
   have H : (natural_transformation.compose natural_transformation.id η)^.eta = η^.eta, from

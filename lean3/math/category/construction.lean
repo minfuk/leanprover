@@ -154,7 +154,8 @@ namespace category
     section
       open ops Functor
       attribute [reducible]
-      definition opposite_functor {C D : Category} (F : C ⇒ D) : Cᵒᵖ ⇒ Dᵒᵖ :=
+      definition opposite_functor {C : Category} {D : Category}
+        (F : C ⇒ D) : Cᵒᵖ ⇒ Dᵒᵖ :=
         @Functor.mk (Cᵒᵖ) (Dᵒᵖ)
           (λ a, F a)
           (λ a b f, F^.morphism f)
@@ -167,8 +168,8 @@ namespace category
     section
       open prod ops Functor
       attribute [reducible]
-      definition prod_functor {C C' D D' : Category} (F : C ⇒ D) (G : C' ⇒ D')
-          : C ×c C' ⇒ D ×c D' :=
+      definition prod_functor {C : Category} {C' : Category} {D : Category} {D' : Category}
+        (F : C ⇒ D) (G : C' ⇒ D') : C ×c C' ⇒ D ×c D' :=
         Functor.mk (λ a, (F (pr₁ a), G (pr₂ a)) )
           (λ a b f, (F^.morphism (pr₁ f), G^.morphism (pr₂ f)) )
           (λ a, pair_eq (F^.respect_id (pr₁ a)) (G^.respect_id (pr₂ a)) )
@@ -182,12 +183,16 @@ namespace category
     infixr `ᵒᵖᶠ`:max := opposite.opposite_functor
   end ops
 
-  definition functor_category (C D : Category) : category (Functor C D) :=
-    mk (λa b, natural_transformation a b)
+  definition functor_category (C : Category) (D : Category) : category (Functor C D) :=
+    mk (λ a b, natural_transformation a b)
       (λ a b c g f, natural_transformation.compose g f)
       (λ a, natural_transformation.ID a)
       (λ a b c d h g f, natural_transformation.assoc h g f)
       (λ a b f, natural_transformation.id_left f)
       (λ a b f, natural_transformation.id_right f)
+
+  attribute [reducible]
+  definition Functor_category (C : Category) (D : Category) : Category :=
+    Mk (functor_category C D)
 
 end category

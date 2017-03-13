@@ -13,7 +13,7 @@ private def comp {a b c : C} (f : hom b c) (g : hom a b) :=
 
 end abbr
 
-structure Functor (C D : Category) :=
+structure Functor (C : Category) (D : Category) :=
   (object : C → D)
   (morphism : Π ⦃a b : C⦄, hom a b → hom (object a) (object b))
   (respect_id : Π (a : C), morphism (ID a) = ID (object a))

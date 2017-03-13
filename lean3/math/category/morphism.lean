@@ -154,17 +154,6 @@ namespace morphism
       (@inverse _ _ _ _ (iso H) (is_iso H)) (@inverse_is_iso _ _ _ _ (iso H) (is_iso H))
     theorem trans ⦃a b c : ob⦄ (H1 : a ≅ b) (H2 : b ≅ c) : a ≅ c := @mk _ _ _ _
       (iso H2 ∘ iso H1) (@composition_is_iso _ _ _ _ _ _ _ (is_iso H1) (is_iso H2))
-
-    variables {ob' : Type} [C' : category ob']
-    omit C
-    include C'
-
-    attribute [instance]
-    theorem is_equivalence_eq (T : Type) : is_equivalence (isomorphic : ob' → ob' → Type) :=
-      is_equivalence.mk refl symm trans
-    
-    omit C'
-    include C
   end isomorphic
 
   attribute [class]

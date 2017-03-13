@@ -1,7 +1,7 @@
-universe variable u
+universe variables u v
 
 class category (ob : Type u) :=
-  (hom : ob → ob → Type)
+  (hom : ob → ob → Type v)
   (comp : Π ⦃a b c : ob⦄, hom b c → hom a b → hom a c)
   (ID : Π (a : ob), hom a a)
   (assoc : Π ⦃a b c d : ob⦄ (h : hom c d) (g : hom b c) (f : hom a b),

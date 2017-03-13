@@ -1,6 +1,7 @@
 import ..category
 import ..functor
 import ..construction
+import ..morphism
 
 universe variables u
 
@@ -143,151 +144,95 @@ namespace Functor
       (@co_hom_functor_resp_id D a)
       (@co_hom_functor_resp_comp D a)
 
-/-
-  variables {b : carrier D}
-
-  example (i : a ⟶ b) (j : b ⟶ a)
-    (H1 : j ∘ i = id) (H2 : i ∘ j = id) : a ≅ b :=
-    iso.mk i (is_iso.mk _ H1 H2)
-  
-  definition hom.a [reducible] (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : a ⟶ a) : a ⟶ b
-    := (natural_map (to_hom τ) a : (a ⟶ a) → (a ⟶ b)) h
-  
-  definition hom.b [reducible] (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : b ⟶ a) : b ⟶ b
-    := (natural_map (to_hom τ) b : (b ⟶ a) → (b ⟶ b)) h
-  
-  definition inv.a [reducible] (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : a ⟶ b) : a ⟶ a
-    := (natural_map (to_inv τ) a : (a ⟶ b) → (a ⟶ a)) h
-  
-  definition inv.b [reducible] (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : b ⟶ b) : b ⟶ a
-    := (natural_map (to_inv τ) b : (b ⟶ b) → (b ⟶ a)) h
-
-  theorem Ha0 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (i : a ⟶ b) (j : b ⟶ a) :
-    hom.a τ (j ∘ i) = (hom.b τ j) ∘ i :=
--/
-/-
-    calc hom.a τ (j ∘ i)
-          = hom.a τ ((λx, x ∘ i) j) : rfl
-      ... = ((natural_map (to_hom τ) a) ∘ (to_fun_hom (contravariant_hom_functor a) i)) j : rfl
-      ... = ((to_fun_hom (contravariant_hom_functor b) i) ∘ (natural_map (to_hom τ) b)) j
-        : apd10' j ((@naturality _ _ _ _ (to_hom τ) b a i)⁻¹)
-      ... = (λx, x ∘ i) (hom.b τ j) : rfl
-      ... = (hom.b τ j) ∘ i : rfl
--/
-/-
-    apd10' j ((@naturality _ _ _ _ (to_hom τ) b a i)⁻¹)
-
-  theorem Hb0 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (i : a ⟶ b) (j : b ⟶ a) :
-    inv.b τ (i ∘ j) = (inv.a τ i) ∘ j :=
--/
-/-
-    calc inv.b τ (i ∘ j)
-          = inv.b τ ((λx, x ∘ j) i) : rfl
-      ... = ((natural_map (to_inv τ) b) ∘ (to_fun_hom (contravariant_hom_functor b) j)) i : rfl
-      ... = ((to_fun_hom (contravariant_hom_functor a) j) ∘ (natural_map (to_inv τ) a)) i
-        : apd10' i ((@naturality _ _ _ _ (to_inv τ) a b j)⁻¹)
-      ... = (λx, x ∘ j) (inv.a τ i) : rfl
-      ... = (inv.a τ i) ∘ j : rfl
--/
-/-
-    apd10' i ((@naturality _ _ _ _ (to_inv τ) a b j)⁻¹)
-
-  theorem Ha1 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    : (to_inv τ) ∘n (to_hom τ) = 1 :=
--/
-/-
-    calc (to_inv τ) ∘n (to_hom τ)
-          = (@inverse (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _) ∘n (to_hom τ) : rfl
-      ... = 1 : @left_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
--/
-/-
-    @left_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
-
-  theorem Hb1 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    : (to_hom τ) ∘n (to_inv τ) = 1 :=
--/
-/-
-    calc (to_hom τ) ∘n (to_inv τ)
-          = (to_hom τ) ∘n (@inverse (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _) : rfl
-      ... = 1 : @right_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
--/
-/-
-      @right_inverse  (Dᵒᵖ ⇒ set.{v}) _ _ _ (to_hom τ) _
--/
-/-
-theorem Ha3 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-  : (natural_map (to_inv τ) b) ∘ (natural_map (to_hom τ) a) =
-    @homset _ D a a :=
-  by apply left_inv
-
-theorem Ha4 (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-  : ((to_hom τ⁻¹) a) ∘ ((to_hom τ) a) =
-    @ID _ set.{v} (to_fun_ob (contravariant_hom_functor a) a) :=
-  rfl
--/
-/-
-  example (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    : (natural_map (to_inv τ) a) ∘ (natural_map (to_hom τ) a) =
-      (natural_map ((to_inv τ) ∘ (to_hom τ)) a) := rfl
-
-  example (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    : (to_inv τ) = (to_hom τ)⁻¹ := rfl
-
-  theorem Ha (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : a ⟶ a) : inv.a τ (hom.a τ h) = h :=
-    have Hx : natural_map ((to_inv τ) ∘n (to_hom τ)) a = λx, x, from
-      calc natural_map ((to_inv τ) ∘n (to_hom τ)) a
-            = natural_map (@nat_trans.id Dᵒᵖ set.{v} (contravariant_hom_functor a)) a :
-              (Ha1 τ) ▸ rfl
-        ... = λx, x : rfl,
-    calc inv.a τ (hom.a τ h)
-          = (natural_map ((to_inv τ) ∘n (to_hom τ)) a) h : rfl
-      ... = (λx, x) h : apd10' h Hx
-      ... = h : rfl
-
-  theorem Hb (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    (h : b ⟶ b) : hom.b τ (inv.b τ h) = h :=
-    have Hx : natural_map ((to_hom τ) ∘n (to_inv τ)) b = λx, x, from
-      calc natural_map ((to_hom τ) ∘n (to_inv τ)) b
-            = natural_map (@nat_trans.id Dᵒᵖ set.{v} (contravariant_hom_functor b)) b :
-              (Hb1 τ) ▸ rfl
-        ... = λx, x : rfl,
-    calc hom.b τ (inv.b τ h)
-          = (natural_map ((to_hom τ) ∘n (to_inv τ)) b) h : rfl
-      ... = (λx, x) h : apd10' h Hx
-      ... = h : rfl
-
-set_option unifier.max_steps 50000
-
-  example (τ : (contravariant_hom_functor a) ≅ (contravariant_hom_functor b))
-    : a ≅ b :=
-    let i := hom.a τ (ID a) in
-    let j := inv.b τ (ID b) in
-    have H1 : j ∘ i = id, from
-      calc j ∘ i
-            = inv.a τ (hom.a τ (j ∘ i)) : (Ha τ (j ∘ i))⁻¹
-        ... = inv.a τ ((hom.b τ j) ∘ i) : Ha0 τ i j
-        ... = inv.a τ ((hom.b τ (inv.b τ (ID b))) ∘ i) : rfl
-        ... = inv.a τ ((ID b) ∘ i) : Hb τ (ID b)
-        ... = inv.a τ (i) : id_left i
-        ... = inv.a τ (hom.a τ (ID a)) : rfl
-        ... = ID a : Ha τ (ID a),
-    have H2 : i ∘ j = id, from
-      calc i ∘ j
-            = hom.b τ (inv.b τ (i ∘ j)) : (Hb τ (i ∘ j))⁻¹
-        ... = hom.b τ ((inv.a τ i) ∘ j) : Hb0 τ i j
-        ... = hom.b τ ((inv.a τ (hom.a τ (ID a))) ∘ j) : rfl
-        ... = hom.b τ ((ID a) ∘ j) : Ha τ (ID a)
-        ... = hom.b τ (j) : id_left j
-        ... = hom.b τ (inv.b τ (ID b)) : rfl
-        ... = ID b : Hb τ (ID b),
-    iso.mk i (is_iso.mk _ H1 H2)
--/
-
 end Functor
+
+namespace hom_functor
+  
+  open category
+  open category.opposite
+  open category.ops
+  open category.set
+  open function
+  open Functor
+  open morphism
+
+  variables {D : Category}
+  variables {a b : D^.carrier}
+
+  theorem hom_functor_iso_object_iso
+    (τ : @isomorphic _ (@Functor_category (Dᵒᵖ) Set_category)^.struct
+      (contravariant_hom_functor a) (contravariant_hom_functor b))
+    : @isomorphic _ D^.struct a b :=
+    let τ_iso := τ^.iso in
+    let τ_iso_inv := (@inverse _ (@Functor_category (Dᵒᵖ) Set_category)^.struct _ _ (τ^.iso) τ^.is_iso) in
+    let i := τ_iso^.eta in
+    let j := τ_iso_inv^.eta in
+    let hom_a := λ (h : @hom _ D^.struct a a), (i a : (@hom _ D^.struct a a) → (@hom _ D^.struct a b)) h in
+    let hom_b := λ (h : @hom _ D^.struct b a), (i b : (@hom _ D^.struct b a) → (@hom _ D^.struct b b)) h in
+    let inv_a := λ (h : @hom _ D^.struct a b), (j a : (@hom _ D^.struct a b) → (@hom _ D^.struct a a)) h in
+    let inv_b := λ (h : @hom _ D^.struct b b), (j b : (@hom _ D^.struct b b) → (@hom _ D^.struct b a)) h in
+    let ia := hom_a (@ID _ D^.struct a) in
+    let jb := inv_b (@ID _ D^.struct b) in
+    have Ha0 : τ_iso_inv ∘n τ_iso
+      = @natural_transformation.id (Dᵒᵖ) Set_category (contravariant_hom_functor a), from
+      @inverse_compose _ (@Functor_category (Dᵒᵖ) Set_category)^.struct _ _ τ_iso τ^.is_iso,
+    have Ha : ∀(h : @hom _ D^.struct a a), inv_a (hom_a h) = h, from
+      take h,
+      calc inv_a (hom_a h)
+            = ((τ_iso_inv ∘n τ_iso) a) h : rfl
+        ... = ((@natural_transformation.id (Dᵒᵖ) Set_category (contravariant_hom_functor a)) a) h
+          : by rw Ha0
+        ... = (λx, x) h : rfl
+        ... = h : rfl,
+    have Hb0 : τ_iso ∘n τ_iso_inv
+      = @natural_transformation.id (Dᵒᵖ) Set_category (contravariant_hom_functor b), from
+      @compose_inverse _ (@Functor_category (Dᵒᵖ) Set_category)^.struct _ _ τ_iso τ^.is_iso,
+    have Hb : ∀(h : @hom _ D^.struct b b), hom_b (inv_b h) = h, from
+      take h,
+      calc hom_b (inv_b h)
+            = ((τ_iso ∘n τ_iso_inv) b) h : rfl
+        ... = ((@natural_transformation.id (Dᵒᵖ) Set_category (contravariant_hom_functor b)) b) h
+          : by rw Hb0
+        ... = (λx, x) h : rfl
+        ... = h : rfl,
+    have Ha0 : hom_a (@category.comp _ D^.struct _ _ _ jb ia)
+      = @category.comp _ D^.struct _ _ _ (hom_b jb) ia, from
+      calc hom_a (@category.comp _ D^.struct _ _ _ jb ia)
+            = hom_a ((λx, @category.comp _ D^.struct _ _ _ x ia) jb) : rfl
+        ... = ((τ_iso^.eta a) ∘ ((contravariant_hom_functor a)^.morphism ia)) jb : rfl
+        ... = (((contravariant_hom_functor b)^.morphism ia) ∘ (τ_iso^.eta b)) jb
+          : eq.symm (congr_fun (τ_iso^.commute ia) jb)
+        ... = (λx, @category.comp _ D^.struct _ _ _ x ia) (hom_b jb) : rfl
+        ... = @category.comp _ D^.struct _ _ _ (hom_b jb) ia : rfl,
+    have Hb0 : inv_b (@category.comp _ D^.struct _ _ _ ia jb)
+      = @category.comp _ D^.struct _ _ _ (inv_a ia) jb, from
+      calc inv_b (@category.comp _ D^.struct _ _ _ ia jb)
+            = inv_b ((λx, @category.comp _ D^.struct _ _ _ x jb) ia) : rfl
+        ... = ((τ_iso_inv^.eta b) ∘ ((contravariant_hom_functor b)^.morphism jb)) ia : rfl
+        ... = (((contravariant_hom_functor a)^.morphism jb) ∘ (τ_iso_inv^.eta a)) ia
+          : eq.symm (congr_fun (τ_iso_inv^.commute jb) ia)
+        ... = (λx, @category.comp _ D^.struct _ _ _ x jb) (inv_a ia) : rfl
+        ... = @category.comp _ D^.struct _ _ _ (inv_a ia) jb : rfl,
+    have H₁ : @category.comp _ D^.struct _ _ _ jb ia = @ID _ D^.struct a, from
+      calc @category.comp _ D^.struct _ _ _ jb ia
+            = inv_a (hom_a (@category.comp _ D^.struct _ _ _ jb ia))
+              : eq.symm (Ha (@category.comp _ D^.struct _ _ _ jb ia))
+        ... = inv_a (@category.comp _ D^.struct _ _ _ (hom_b jb) ia) : by rw Ha0
+        ... = inv_a (@category.comp _ D^.struct _ _ _ (hom_b (inv_b (@ID _ D^.struct b))) ia) : rfl
+        ... = inv_a (@category.comp _ D^.struct _ _ _ (@ID _ D^.struct b) ia) : by rw Hb (@ID _ D^.struct b)
+        ... = inv_a (ia) : by rw @id_left _ D^.struct _ _ ia
+        ... = inv_a (hom_a (@ID _ D^.struct a)) : rfl
+        ... = @ID _ D^.struct a : Ha (@ID _ D^.struct a),
+    have H₂ : @category.comp _ D^.struct _ _ _ ia jb = @ID _ D^.struct b, from
+      calc @category.comp _ D^.struct _ _ _ ia jb
+            = hom_b (inv_b (@category.comp _ D^.struct _ _ _ ia jb))
+              : eq.symm (Hb (@category.comp _ D^.struct _ _ _ ia jb))
+        ... = hom_b (@category.comp _ D^.struct _ _ _ (inv_a ia) jb) : by rw Hb0
+        ... = hom_b (@category.comp _ D^.struct _ _ _ (inv_a (hom_a (@ID _ D^.struct a))) jb) : rfl
+        ... = hom_b (@category.comp _ D^.struct _ _ _ (@ID _ D^.struct a) jb) : by rw Ha (@ID _ D^.struct a)
+        ... = hom_b (jb) : by rw @id_left _ D^.struct _ _ jb
+        ... = hom_b (inv_b (@ID _ D^.struct b)) : rfl
+        ... = @ID _ D^.struct b : Hb (@ID _ D^.struct b),
+    @isomorphic.mk _ D^.struct _ _ ia (is_iso.mk H₁ H₂)
+
+end hom_functor

@@ -94,4 +94,59 @@ namespace universal
             (@is_iso.mk _ C^.struct _ _ h1 h2 (and.left H9) (and.right H9))) rfl)),
     classical.some H'
 
+  structure coequalizer {a b : C} (f g : a ⟶ b) :=
+  (e : C)
+  (u : b ⟶ e)
+  (i : u ∘ f = u ∘ g)
+  (ii : ∀(c : C) (h : b ⟶ c), ∃!(h' : e ⟶ c), h = h' ∘ u)
+
+  theorem coequalizer_univ_id {a b : C} {f g : a ⟶ b} (x : coequalizer f g) :
+    ∀h, x^.u = h ∘ x^.u → h = ID (x^.e) :=
+    have H :  ∀h1 h2, x^.u = h1 ∘ x^.u → x^.u = h2 ∘ x^.u → h1 = h2, from
+      take h1,
+      take h2,
+      assume H1 : x^.u = h1 ∘ x^.u,
+      assume H2 : x^.u = h2 ∘ x^.u,
+      unique_of_exists_unique (x^.ii x^.e x^.u) H1 H2,
+    take h,
+    assume H3 : x^.u = h ∘ x^.u,
+    have H4 : x^.u = (ID x^.e) ∘ x^.u, from eq.symm (id_left x^.u),
+    H h (ID x^.e) H3 H4
+
+  noncomputable theorem coequalizer_iso {a b : C} {f g : a ⟶ b}
+    (x y : coequalizer f g) : x^.e ≅ y^.e :=
+    have H : ∃h1 h2, h2 ∘ h1 = ID x^.e ∧ h1 ∘ h2 = ID y^.e, from
+      exists_unique.elim (x^.ii y^.e y^.u)
+        (take h1,
+        assume H1 : y^.u = h1 ∘ x^.u,
+        assume H1_ : _,
+        exists_unique.elim (y^.ii x^.e x^.u)
+          (take h2,
+          assume H2 : x^.u = h2 ∘ y^.u,
+          assume H2_ : _,
+          have H3 : x^.u = (h2 ∘ h1) ∘ x^.u, from
+            calc x^.u
+                  = h2 ∘ y^.u : H2
+              ... = h2 ∘ (h1 ∘ x^.u) : congr_arg (λ x, h2 ∘ x) H1
+              ... = (h2 ∘ h1) ∘ x^.u : assoc h2 h1 x^.u,
+          have H4 : y^.u = (h1 ∘ h2) ∘ y^.u, from
+            calc y^.u
+                  = h1 ∘ x^.u : H1
+              ... = h1 ∘ (h2 ∘ y^.u) : congr_arg (λ x, h1 ∘ x) H2
+              ... = (h1 ∘ h2) ∘ y^.u : assoc h1 h2 y^.u,
+          have H5 : h2 ∘ h1 = ID x^.e ∧ h1 ∘ h2 = ID y^.e, from
+            and.intro (coequalizer_univ_id x (h2 ∘ h1) H3)
+              (coequalizer_univ_id y (h1 ∘ h2) H4),
+          exists.intro h1 (exists.intro h2 H5))),
+    have H' : ∃(iso : x^.e ≅ y^.e), iso = iso, from
+      exists.elim H
+        (take h1,
+        assume H6,
+        exists.elim H6
+          (take h2,
+          assume H7 : h2 ∘ h1 = ID x^.e ∧ h1 ∘ h2 = ID y^.e,
+          exists.intro (@isomorphic.mk _ C^.struct _ _ h1
+            (@is_iso.mk _ C^.struct _ _ h1 h2 (and.left H7) (and.right H7))) rfl)),
+    classical.some H'
+
 end universal

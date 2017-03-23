@@ -223,4 +223,45 @@ namespace universal
             (@is_iso.mk _ C^.struct _ _ h1 h2 (and.left H7) (and.right H7))) rfl)),
     classical.some H'
 
+  noncomputable example {A : Type} {S : A → C}
+    (Q : ∀(u v : A), (S u ⟶ S v) → Prop)
+    (H0 : ∀u, Q u u (ID (S u)))
+    (H1 : ∀{u v w} {t1 : S u ⟶ S v} {t2 : S v ⟶ S w},
+      (Q u v t1) → (Q v w t2) → Q u w (t2 ∘ t1))
+    (H2 : ∀(u v), ∃!(t : S u ⟶ S v), Q u v t)
+    (x y : A) : (S x) ≅ (S y) :=
+    have Hx1 : ∀u v t1 t2, Q u v t1 → Q u v t2 → t1 = t2, from
+      take u,
+      take v,
+      take t1,
+      take t2,
+      assume Hx2 : Q u v t1,
+      assume Hx3 : Q u v t2,
+      unique_of_exists_unique (H2 u v) Hx2 Hx3,
+    have H : ∃t1 t2, t2 ∘ t1 = ID (S x) ∧ t1 ∘ t2 = ID (S y), from
+      exists_unique.elim (H2 x y)
+        (take t1,
+        assume Hx5 : Q x y t1,
+        assume Hx5_ : _,
+        exists_unique.elim (H2 y x)
+          (take t2,
+          assume Hx6 : Q y x t2,
+          assume Hx6_ : _,
+          have Hx7 : Q x x (t2 ∘ t1), from H1 Hx5 Hx6,
+          have Hx8 : Q y y (t1 ∘ t2), from H1 Hx6 Hx5,
+          have Hx9 : t2 ∘ t1 = ID (S x) ∧ t1 ∘ t2 = ID (S y), from
+            and.intro (Hx1 x x (t2 ∘ t1) (ID (S x)) Hx7 (H0 x))
+              (Hx1 y y (t1 ∘ t2) (ID (S y)) Hx8 (H0 y)),
+          exists.intro t1 (exists.intro t2 Hx9))),
+    have H' : ∃(iso : (S x) ≅ (S y)), iso = iso, from
+      exists.elim H
+        (take t1,
+        assume Hx10,
+        exists.elim Hx10
+          (take t2,
+          assume Hx11 : t2 ∘ t1 = ID (S x) ∧ t1 ∘ t2 = ID (S y),
+          exists.intro (@isomorphic.mk _ C^.struct _ _ t1
+            (@is_iso.mk _ C^.struct _ _ t1 t2 (and.left Hx11) (and.right Hx11))) rfl)),
+    classical.some H'
+
 end universal

@@ -149,4 +149,78 @@ namespace universal
             (@is_iso.mk _ C^.struct _ _ h1 h2 (and.left H7) (and.right H7))) rfl)),
     classical.some H'
 
+  structure pushout {a b c : C} (f : a ⟶ b) (g : a ⟶ c) :=
+  (r : C)
+  (u : b ⟶ r)
+  (v : c ⟶ r)
+  (i : u ∘ f = v ∘ g)
+  (ii : ∀(s : C) (h : b ⟶ s) (k : c ⟶ s), h ∘ f = k ∘ g
+    → ∃!(t : r ⟶ s), t ∘ u = h ∧ t ∘ v = k)
+
+  theorem pushout_univ_id {a b c : C} {f : a ⟶ b} {g : a ⟶ c}
+    (x : pushout f g) :
+    ∀t, t ∘ x^.u = x^.u → t ∘ x^.v = x^.v → t = ID (x^.r) :=
+    have H : ∀t1 t2, t1 ∘ x^.u = x^.u → t1 ∘ x^.v = x^.v
+      → t2 ∘ x^.u = x^.u → t2 ∘ x^.v = x^.v → t1 = t2, from
+      take t1,
+      take t2,
+      assume H1 : t1 ∘ x^.u = x^.u,
+      assume H2 : t1 ∘ x^.v = x^.v,
+      assume H3 : t2 ∘ x^.u = x^.u,
+      assume H4 : t2 ∘ x^.v = x^.v,
+      unique_of_exists_unique (x^.ii x^.r x^.u x^.v x^.i)
+        (and.intro H1 H2) (and.intro H3 H4),
+    take t,
+    assume H5 : t ∘ x^.u = x^.u,
+    assume H6 : t ∘ x^.v = x^.v,
+    have H7 : (ID x^.r) ∘ x^.u = x^.u, from id_left x^.u,
+    have H8 : (ID x^.r) ∘ x^.v = x^.v, from id_left x^.v,
+    H t (ID x^.r) H5 H6 H7 H8
+
+  noncomputable theorem pushout_iso {a b c : C} {f : a ⟶ b} {g : a ⟶ c}
+    (x y : pushout f g) : x^.r ≅ y^.r :=
+    have H : ∃h1 h2, h2 ∘ h1 = ID x^.r ∧ h1 ∘ h2 = ID y^.r, from
+      exists_unique.elim (x^.ii y^.r y^.u y^.v y^.i)
+        (take t1,
+        assume H1 : t1 ∘ x^.u = y^.u ∧ t1 ∘ x^.v = y^.v,
+        assume H1_ : _,
+        exists_unique.elim (y^.ii x^.r x^.u x^.v x^.i)
+          (take t2,
+          assume H2 : t2 ∘ y^.u = x^.u ∧ t2 ∘ y^.v = x^.v,
+          assume H2_ : _,
+          have H3 : (t2 ∘ t1) ∘ x^.u = x^.u, from
+            calc (t2 ∘ t1) ∘ x^.u
+                  = t2 ∘ (t1 ∘ x^.u) : eq.symm (assoc t2 t1 x^.u)
+              ... = t2 ∘ y^.u : by rw (and.left H1)
+              ... = x^.u : and.left H2,
+          have H4 : (t2 ∘ t1) ∘ x^.v = x^.v, from
+            calc (t2 ∘ t1) ∘ x^.v
+                  = t2 ∘ (t1 ∘ x^.v) : eq.symm (assoc t2 t1 x^.v)
+              ... = t2 ∘ y^.v : by rw (and.right H1)
+              ... = x^.v : and.right H2,
+          have H5 : (t1 ∘ t2) ∘ y^.u = y^.u, from
+            calc (t1 ∘ t2) ∘ y^.u
+                  = t1 ∘ (t2 ∘ y^.u) : eq.symm (assoc t1 t2 y^.u)
+              ... = t1 ∘ x^.u : by rw (and.left H2)
+              ... = y^.u : and.left H1,
+          have H6 : (t1 ∘ t2) ∘ y^.v = y^.v, from
+            calc (t1 ∘ t2) ∘ y^.v
+                  = t1 ∘ (t2 ∘ y^.v) : eq.symm (assoc t1 t2 y^.v)
+              ... = t1 ∘ x^.v : by rw (and.right H2)
+              ... = y^.v : and.right H1,
+          have H7 : t2 ∘ t1 = ID x^.r ∧ t1 ∘ t2 = ID y^.r, from
+            and.intro (pushout_univ_id x (t2 ∘ t1) H3 H4)
+              (pushout_univ_id y (t1 ∘ t2) H5 H6),
+          exists.intro t1 (exists.intro t2 H7))),
+    have H' : ∃(iso : x^.r ≅ y^.r), iso = iso, from
+      exists.elim H
+        (take h1,
+        assume H8,
+        exists.elim H8
+          (take h2,
+          assume H7 : h2 ∘ h1 = ID x^.r ∧ h1 ∘ h2 = ID y^.r,
+          exists.intro (@isomorphic.mk _ C^.struct _ _ h1
+            (@is_iso.mk _ C^.struct _ _ h1 h2 (and.left H7) (and.right H7))) rfl)),
+    classical.some H'
+
 end universal

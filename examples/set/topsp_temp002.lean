@@ -1,5 +1,5 @@
 import logic.eq data.set.basic data.set.function data.set.finite
-  theories.topology.basic
+  theories.topology.basic theories.topology.continuous
 open eq eq.ops set classical topology
 
 -- check preimage
